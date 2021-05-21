@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th ="http://www.thymeleaf.org" xmlns:sec = "http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments :: header"></head>
+
+<body>
+
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: #204969">
+        <a class="navbar-brand" th:href="@{/}">OpenPodcast</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" th:href="@{/}">Home<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/register}">Register</a>
+                </li>
+                <li class="nav-item active" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                </li>
+                <li class="nav-item active" sec:authorize="isAuthenticated()">
+                    <a class="nav-link"
+                       href="JavaScript:void(0)" onclick="document.getElementById('logoutId').submit()">Logout</a>
+                </li>
+            </ul>
+            <!-- работающий костыль для log out -->
+            <form th:action="@{'/logout'}" method="post" id="logoutId" sec:authorize="isAuthenticated()">
+            </form>
+            <h4 class="navbar-text">Nickname : </h4>
+            <h4 class="navbar-text" sec:authorize="${isAuthenticated()}"
+                th:text="${currentClient.getNickname()}"> </h4>
+        </div>
+    </nav>
+</div><br>
+<div class="container">
+    <button sec:authorize="hasRole('ROLE_ADMIN')" type="button" class="container btn btn-info" data-toggle="modal" data-target="#myModal">
+    ADD PODCAST</button>
+</div>
+
+<!-- The Modal -->
+<div sec:authorize="hasRole('ROLE_ADMIN')" class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">New Podcast</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form th:action="@{/}" th:object="${newPodcast}" method="post" class="was-validated">
+                    <div class="form-group">
+                        <label for="uname">Title:</label>
+                        <input type="text" name="title" th:field="*{title}" class="form-control" id="uname" placeholder="Enter Title"  required>
+                        <div class="valid-feedback">Valid.</div>
+                        <div class="invalid-feedback">Please fill out this field.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Description:</label>
+                        <textarea type="text" class="form-control" name="description" id="pwd"
+                                  th:field="*{description}" placeholder="Enter Description"  required></textarea>
+                        <div class="valid-feedback">Valid.</div>
+                        <div class="invalid-feedback">Please fill out this field.</div>
+                    </div>
+                    <input type="submit" class="btn btn-info" value="+ ADD">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<br>
+<div class="container">
+    <div th:each="podcast: ${podcastList}">
+    <div class="card mb-3">
+        <div class="row no-gutters">
+            <div class="col-md-4">
+                <img src="https://image.freepik.com/free-vector/retro-cassette-tape-music-record-icon-illustration-vector_53876-25392.jpg"  class="card-img">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h4 class="card-title" th:text="${podcast.title}"></h4>
+                    <p class="card-text" th:text="${podcast.description}"></p>
+                    <iframe src="https://learningenglish.voanews.com/embed/player/0/2293941.html?type=audio" frameborder="0" scrolling="no" width="100%" height="144" allowfullscreen></iframe>
+                    <br>
+                    <a th:href="@{/edit/{id}(id=${podcast.id})}" sec:authorize="hasRole('ROLE_ADMIN')"
+                       class="btn btn-info">Edit Podcast</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th ="http://www.thymeleaf.org"
+      xmlns:sec = "http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments :: header"></head>
+<body>
+<div th:replace="fragments :: navbar"></div>
+<div class="container">
+    <h2 class="text-center text-danger">403 ACCESS FORBIDDEN YOUR <span th:text="${currentClient.getRole()
+    .get(0).getRole()}"></span></h2>
+
+</div>
+
+</body>
+</html>
